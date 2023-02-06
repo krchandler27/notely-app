@@ -1,36 +1,44 @@
 const notes = require('express').Router();
-const { readFromFile, readAndAppend } = require('../helpers/fsUtils');
 const { v4: uuidv4 } = require('uuid');
 let db = require('../db/db.json');
+const fs = require('fs');
+const util = require('util');
 
-// GET Route for retrieving all the notes
+// GET Route for sending all notes to the db
 notes.get('/notes', (req, res) => {
-
-console.log(db);
-res.json(db);
-  // readFromFile('../db/db.json').then((data) => res.json(JSON.parse(data)));
+  res.sendFile(path.join(__dirname, './db/db.json'))
 });
 
-// POST Route for a new UX/UI note
-notes.post('/notes', (req, res) => {
-  console.log(db);
 
+// POST Route for adding new note to db
+notes.post('/notes', (req, res) => {
+  const note = JSON.parse(fs.readFileSync('./db/db.json'));
+  console.log(db);
   const { title, text } = req.body;
 
   if (req.body) {
-    const newnote = {
+    const newNote = {
       title,
       text,
-      note_id: uuidv4(),
+      id: uuidv4(),
     };
-    db.push(newnote);
-    console.log(db);
 
-    readAndAppend(newnote, '../db/db.json');
-    res.json(`note added successfully 🚀`);
+    note.push(newNote);
+    console.log(db);
+    res.json(`Note added successfully 👍.`)
   } else {
-    res.error('Error in adding note');
+    res.error('Error in adding note.');
   }
+  fs.writeFileSync('./db/db.json', JSON.stringify(note, "utf-8"));
+  res.json(note);
+});
+
+// DELETE Route for old note
+notes.delete('/api/notes/:id', (req, res) => {
+  const note = JSON.parse(fs.readFileSync('./db/db.json'));
+  const removeNote = note.filter((delNote) => delNote.id !== req.params.id);
+  fs.writeFileSync('./db/db.json', JSON.stringify(removeNote));
+  res.json(removeNote);
 });
 
 module.exports = notes;
