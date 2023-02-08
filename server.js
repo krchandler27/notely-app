@@ -11,23 +11,22 @@ notes.use(express.json());
 notes.use(express.urlencoded({ extended: true }));
 notes.use(express.static('public'));
 
-//Read datebase file and parse it using json
+//Read database file and parse it using json
 const findNotes = () => {
   return readFile('db/db.json', 'utf-8')
   .then(baseNotes => [].concat(JSON.parse(baseNotes)))
 }
 
-// GET Route to display notes
+// GET route to display notes
 notes.get('/api/notes', (req, res) => {
   console.log("getting api notes");
   res.sendFile(path.join(__dirname, './db/db.json'))
 });
 
 
-// POST Route for adding new note to db
-notes.post('/notes', (req, res) => {
+// POST route for adding new note to db
+notes.post('/api/notes', (req, res) => {
   const note = JSON.parse(fs.readFileSync('./db/db.json'));
-  console.log(db);
   const { title, text } = req.body;
 
   if (req.body) {
@@ -38,7 +37,6 @@ notes.post('/notes', (req, res) => {
     };
 
     note.push(newNote);
-    console.log(db);
     res.json(`Note added successfully 👍.`)
   } else {
     res.error('Error in adding note.');
