@@ -4,12 +4,12 @@ const fs = require('fs');
 const util = require('util');
 const { v4: uuidv4 } = require('uuid');
 const PORT = process.env.port || 3001;
-const app = express();
+const notes = express();
 
 // Middleware for parsing JSON and urlencoded form data
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static('public'));
+notes.use(express.json());
+notes.use(express.urlencoded({ extended: true }));
+notes.use(express.static('public'));
 
 //Read datebase file and parse it using json
 const findNotes = () => {
@@ -18,7 +18,8 @@ const findNotes = () => {
 }
 
 // GET Route to display notes
-notes.get('api/notes', (req, res) => {
+notes.get('/api/notes', (req, res) => {
+  console.log("getting api notes");
   res.sendFile(path.join(__dirname, './db/db.json'))
 });
 
@@ -56,18 +57,17 @@ notes.delete('/api/notes/:id', (req, res) => {
 
 module.exports = notes;
 
-
-
-
-
-
-
-
-
-
-
-
-
-app.listen(PORT, () =>
+notes.listen(PORT, () =>
   console.log(`App listening at http://localhost:${PORT} ;) <3`)
 );
+
+// GET Route for notes page
+notes.get('/notes', (req, res) =>
+    res.sendFile(path.join(__dirname, './public/notes.html'))
+);
+
+// GET Route for homepage
+notes.get('/', (req, res) =>
+    res.sendFile(path.join(__dirname, './public/index.html'))
+);
+
