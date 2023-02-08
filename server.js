@@ -11,20 +11,20 @@ notes.use(express.json());
 notes.use(express.urlencoded({ extended: true }));
 notes.use(express.static('public'));
 
-//Read database file and parse it using json
+//Code for reading the database file and parsing it using json
 const findNotes = () => {
   return readFile('db/db.json', 'utf-8')
   .then(baseNotes => [].concat(JSON.parse(baseNotes)))
 }
 
-// GET route to display notes
+// GET route for displaying notes.
 notes.get('/api/notes', (req, res) => {
-  console.log("getting api notes");
+  console.log('displaying api notes');
   res.sendFile(path.join(__dirname, './db/db.json'))
 });
 
 
-// POST route for adding new note to db
+// POST route for adding new note to the database.
 notes.post('/api/notes', (req, res) => {
   const note = JSON.parse(fs.readFileSync('./db/db.json'));
   const { title, text } = req.body;
@@ -38,34 +38,36 @@ notes.post('/api/notes', (req, res) => {
 
     note.push(newNote);
     res.json(`Note added successfully 👍.`)
+    console.log('Note added successfully 👍');
   } else {
     res.error('Error in adding note.');
+    console.log('Error in adding note.');
   }
-  fs.writeFileSync('./db/db.json', JSON.stringify(note, "utf-8"));
+  fs.writeFileSync('./db/db.json', JSON.stringify(note, 'utf-8'));
   res.json(note);
 });
 
-// DELETE Route for old note
+// DELETE Route for unwanted note.
 notes.delete('/api/notes/:id', (req, res) => {
   const note = JSON.parse(fs.readFileSync('./db/db.json'));
   const removeNote = note.filter((delNote) => delNote.id !== req.params.id);
   fs.writeFileSync('./db/db.json', JSON.stringify(removeNote));
   res.json(removeNote);
+  console.log('note deleted, cannot undo.;)')
 });
 
-module.exports = notes;
+// GET route for notes page.
+notes.get('/notes', (req, res) =>
+    res.sendFile(path.join(__dirname, './public/notes.html'))
+);
+
+// GET Route for homepage.
+notes.get('/', (req, res) =>
+    res.sendFile(path.join(__dirname, './public/index.html'))
+);
 
 notes.listen(PORT, () =>
   console.log(`App listening at http://localhost:${PORT} ;) <3`)
 );
 
-// GET Route for notes page
-notes.get('/notes', (req, res) =>
-    res.sendFile(path.join(__dirname, './public/notes.html'))
-);
-
-// GET Route for homepage
-notes.get('/', (req, res) =>
-    res.sendFile(path.join(__dirname, './public/index.html'))
-);
-
+module.exports = notes;
