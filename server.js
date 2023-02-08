@@ -23,7 +23,6 @@ notes.get('/api/notes', (req, res) => {
   res.sendFile(path.join(__dirname, './db/db.json'))
 });
 
-
 // POST route for adding new note to the database.
 notes.post('/api/notes', (req, res) => {
   const note = JSON.parse(fs.readFileSync('./db/db.json'));
