@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const util = require('util');
 const { v4: uuidv4 } = require('uuid');
-const PORT = process.env.port || 3001;
+const PORT = process.env.PORT || 3001;
 const notes = express();
 
 // Middleware for parsing JSON and urlencoded form data
@@ -36,14 +36,15 @@ notes.post('/api/notes', (req, res) => {
     };
 
     note.push(newNote);
-    res.json(`Note added successfully 👍.`)
+    fs.writeFileSync('./db/db.json', JSON.stringify(note, 'utf-8'));
+    res.json(note);
+    // res.json(`Note added successfully 👍.`)
     console.log('Note added successfully 👍');
   } else {
     res.error('Error in adding note.');
     console.log('Error in adding note.');
   }
-  fs.writeFileSync('./db/db.json', JSON.stringify(note, 'utf-8'));
-  res.json(note);
+
 });
 
 // DELETE Route for unwanted note.
